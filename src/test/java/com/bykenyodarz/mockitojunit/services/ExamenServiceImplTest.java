@@ -3,28 +3,38 @@ package com.bykenyodarz.mockitojunit.services;
 import com.bykenyodarz.mockitojunit.models.Examen;
 import com.bykenyodarz.mockitojunit.repositories.ExamenRepository;
 import com.bykenyodarz.mockitojunit.repositories.PreguntaRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
-import static com.bykenyodarz.mockitojunit.services.Datos.*;
+import static com.bykenyodarz.mockitojunit.services.Datos.EXAMEN_LIST;
+import static com.bykenyodarz.mockitojunit.services.Datos.PREGUNTAS;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ExamenServiceImplTest {
 
+    @Mock
     PreguntaRepository preguntaRepository;
+    @Mock
     ExamenRepository examenRepository;
-    ExamenService service;
+    @InjectMocks
+    //ExamenService service;
+    ExamenServiceImpl service;
 
-    @BeforeEach
+    /*@BeforeEach
     void setUp() {
-        this.preguntaRepository = mock(PreguntaRepository.class);
-        this.examenRepository = mock(ExamenRepository.class);
-        service = new ExamenServiceImpl(examenRepository, preguntaRepository);
-    }
+        MockitoAnnotations.openMocks(this);
+        //this.preguntaRepository = mock(PreguntaRepository.class);
+        //this.examenRepository = mock(ExamenRepository.class);
+        //service = new ExamenServiceImpl(examenRepository, preguntaRepository);
+    }*/
 
     @Test
     void testFindExamenByNombre() {
@@ -67,9 +77,9 @@ class ExamenServiceImplTest {
         var examen = service.findExamenByNombreAndPreguntas("Historia");
         assertAll(
                 () -> assertEquals(5, examen.getPreguntas().size()),
-                () -> assertTrue(examen.getPreguntas().contains("integrales"))
+                () -> assertTrue(examen.getPreguntas().contains("integrales")),
+                () -> verify(examenRepository).findAll(),
+                () -> verify(preguntaRepository).findPreguntaByExamenId(anyLong())
         );
-        verify(examenRepository).findAll();
-        verify(preguntaRepository).findPreguntaByExamenId(anyLong());
     }
 }
