@@ -33,4 +33,14 @@ public class ExamenServiceImpl implements ExamenService{
         examen.setPreguntas(preguntaRepository.findPreguntaByExamenId(examen.getId()));
         return examen;
     }
+
+    /* Parte 2 */
+
+    @Override
+    public Examen saveExamen(Examen examen) {
+        if (!examen.getPreguntas().isEmpty()) {
+            preguntaRepository.guardarVarias(examen.getPreguntas());
+        }
+        return repository.save(examen);
+    }
 }

@@ -12,8 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 
-import static com.bykenyodarz.mockitojunit.services.Datos.EXAMEN_LIST;
-import static com.bykenyodarz.mockitojunit.services.Datos.PREGUNTAS;
+import static com.bykenyodarz.mockitojunit.services.Datos.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -80,6 +79,21 @@ class ExamenServiceImplTest {
                 () -> assertTrue(examen.getPreguntas().contains("integrales")),
                 () -> verify(examenRepository).findAll(),
                 () -> verify(preguntaRepository).findPreguntaByExamenId(anyLong())
+        );
+    }
+
+    @Test
+    void testSaveExamen() {
+        var e = EXAMEN;
+        e.setPreguntas(PREGUNTAS);
+        when(examenRepository.save(any(Examen.class))).thenReturn(EXAMEN);
+        var examen = service.saveExamen(e);
+        assertAll(
+                () -> verify(examenRepository).save(any(Examen.class)),
+                () -> verify(preguntaRepository).guardarVarias(anyList()),
+                () -> assertNotNull(examen.getId()),
+                () -> assertEquals(8L, examen.getId()),
+                () -> assertEquals("Fisica", examen.getNombre())
         );
     }
 }
