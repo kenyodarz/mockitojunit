@@ -102,7 +102,6 @@ class ExamenServiceImplTest {
     @Test
     void testSaveExamenIncremental() {
         // Given
-
         var e = EXAMEN_INCREMENTAL;
         e.setPreguntas(PREGUNTAS);
 
@@ -126,5 +125,15 @@ class ExamenServiceImplTest {
                 () -> assertEquals(8L, examen.getId()),
                 () -> assertEquals("Fisica", examen.getNombre())
         );
+    }
+
+    @Test
+    void testFindExamenByNombreAndPreguntasHandleException() {
+        when(examenRepository.findAll()).thenReturn(EXAMEN_LIST);
+        when(preguntaRepository.findPreguntaByExamenId(anyLong())).thenThrow(IllegalArgumentException.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.findExamenByNombreAndPreguntas("Matematicas");
+        });
+
     }
 }
