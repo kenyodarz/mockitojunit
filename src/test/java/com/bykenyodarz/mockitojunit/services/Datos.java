@@ -18,4 +18,6 @@ public final class Datos {
 
     /* Parte 2 */
     public final static Examen EXAMEN = new Examen(8L, "Fisica");
+    /* Parte 3 */
+    public final static Examen EXAMEN_INCREMENTAL = new Examen(null, "Fisica");
 }

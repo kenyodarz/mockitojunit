@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import java.util.Collections;
 import java.util.List;
@@ -91,6 +93,35 @@ class ExamenServiceImplTest {
         assertAll(
                 () -> verify(examenRepository).save(any(Examen.class)),
                 () -> verify(preguntaRepository).guardarVarias(anyList()),
+                () -> assertNotNull(examen.getId()),
+                () -> assertEquals(8L, examen.getId()),
+                () -> assertEquals("Fisica", examen.getNombre())
+        );
+    }
+
+    @Test
+    void testSaveExamenIncremental() {
+        // Given
+
+        var e = EXAMEN_INCREMENTAL;
+        e.setPreguntas(PREGUNTAS);
+
+        when(examenRepository.save(any(Examen.class))).then(new Answer<Examen>() {
+            Long secuencia = 8L;
+
+            @Override
+            public Examen answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Examen examen = invocationOnMock.getArgument(0);
+                examen.setId(secuencia++);
+                return examen;
+            }
+        });
+
+        // When
+        var examen = service.saveExamen(e);
+
+        // Then
+        assertAll(
                 () -> assertNotNull(examen.getId()),
                 () -> assertEquals(8L, examen.getId()),
                 () -> assertEquals("Fisica", examen.getNombre())
