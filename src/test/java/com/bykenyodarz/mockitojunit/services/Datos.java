@@ -20,4 +20,11 @@ public final class Datos {
     public final static Examen EXAMEN = new Examen(8L, "Fisica");
     /* Parte 3 */
     public final static Examen EXAMEN_INCREMENTAL = new Examen(null, "Fisica");
+
+    /* Arguments matchers */
+    public final static List<Examen> EXAMEN_LIST_NEGATIVE = Arrays.asList(
+            new Examen(-5L, "Matematicas"),
+            new Examen(-6L, "Lengua"),
+            new Examen(-7L, "Historia")
+    );
 }

@@ -5,6 +5,7 @@ import com.bykenyodarz.mockitojunit.repositories.ExamenRepository;
 import com.bykenyodarz.mockitojunit.repositories.PreguntaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -146,5 +147,39 @@ class ExamenServiceImplTest {
         verify(preguntaRepository).findPreguntaByExamenId(argThat(arg -> arg != null && arg.equals(5L)));
         verify(preguntaRepository).findPreguntaByExamenId(eq(5L));
         verify(preguntaRepository).findPreguntaByExamenId(argThat(arg -> arg != null && arg >= 5L));
+    }
+
+    @Test
+    void testArgumentMatchersPart2() {
+        when(examenRepository.findAll()).thenReturn(EXAMEN_LIST);
+        when(preguntaRepository.findPreguntaByExamenId(anyLong())).thenReturn(PREGUNTAS);
+        service.findExamenByNombreAndPreguntas("Matematicas");
+
+        verify(examenRepository).findAll();
+        verify(preguntaRepository).findPreguntaByExamenId(argThat(new MiArgsMatchers()));
+    }
+
+    @Test
+    void testArgumentMatchersPart3() {
+        when(examenRepository.findAll()).thenReturn(EXAMEN_LIST);
+        when(preguntaRepository.findPreguntaByExamenId(anyLong())).thenReturn(PREGUNTAS);
+        service.findExamenByNombreAndPreguntas("Matematicas");
+
+        verify(examenRepository).findAll();
+        verify(preguntaRepository).findPreguntaByExamenId(argThat((args) -> args != null && args > 0));
+    }
+
+    public static class MiArgsMatchers implements ArgumentMatcher<Long> {
+        private Long argument;
+        @Override
+        public boolean matches(Long args) {
+            this.argument = args;
+            return args != null && args > 0;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Mensaje de prueba del test, %s debe ser un entero positivo", argument);
+        }
     }
 }
