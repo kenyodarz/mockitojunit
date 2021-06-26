@@ -5,9 +5,7 @@ import com.bykenyodarz.mockitojunit.repositories.ExamenRepository;
 import com.bykenyodarz.mockitojunit.repositories.PreguntaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -37,6 +35,9 @@ class ExamenServiceImplTest {
         //this.examenRepository = mock(ExamenRepository.class);
         //service = new ExamenServiceImpl(examenRepository, preguntaRepository);
     }*/
+
+    @Captor
+    ArgumentCaptor<Long> argumentCaptor;
 
     @Test
     void testFindExamenByNombre() {
@@ -181,5 +182,19 @@ class ExamenServiceImplTest {
         public String toString() {
             return String.format("Mensaje de prueba del test, %s debe ser un entero positivo", argument);
         }
+    }
+
+    @Test
+    void testArgumentCaptor() {
+        when(examenRepository.findAll()).thenReturn(EXAMEN_LIST);
+        when(preguntaRepository.findPreguntaByExamenId(anyLong())).thenReturn(PREGUNTAS);
+        service.findExamenByNombreAndPreguntas("Matematicas");
+
+        /* now with annotations
+        var argumentCaptor = ArgumentCaptor.forClass(Long.class); */
+
+        verify(preguntaRepository).findPreguntaByExamenId(argumentCaptor.capture());
+
+        assertEquals(5L, argumentCaptor.getValue());
     }
 }
