@@ -134,6 +134,17 @@ class ExamenServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> {
             service.findExamenByNombreAndPreguntas("Matematicas");
         });
+    }
 
+    @Test
+    void testArgumentMatchers() {
+        when(examenRepository.findAll()).thenReturn(EXAMEN_LIST);
+        when(preguntaRepository.findPreguntaByExamenId(anyLong())).thenReturn(PREGUNTAS);
+        service.findExamenByNombreAndPreguntas("Matematicas");
+
+        verify(examenRepository).findAll();
+        verify(preguntaRepository).findPreguntaByExamenId(argThat(arg -> arg != null && arg.equals(5L)));
+        verify(preguntaRepository).findPreguntaByExamenId(eq(5L));
+        verify(preguntaRepository).findPreguntaByExamenId(argThat(arg -> arg != null && arg >= 5L));
     }
 }
