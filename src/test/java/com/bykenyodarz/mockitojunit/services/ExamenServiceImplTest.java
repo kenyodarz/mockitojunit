@@ -207,4 +207,50 @@ class ExamenServiceImplTest {
             service.saveExamen(examen);
         });
     }
+
+    @Test
+    void testDoAnswer() {
+        when(examenRepository.findAll()).thenReturn(EXAMEN_LIST);
+        //when(preguntaRepository.findPreguntaByExamenId(anyLong())).thenReturn(PREGUNTAS);
+        doAnswer(invocationOnMock -> {
+            long id = invocationOnMock.getArgument(0);
+            return id == 5L ? PREGUNTAS : null;
+        }).when(preguntaRepository).findPreguntaByExamenId(anyLong());
+
+        var examen = service.findExamenByNombreAndPreguntas("Matematicas");
+        assertAll(
+                () -> assertEquals(5L, examen.getId()),
+                () -> assertEquals("Matematicas", examen.getNombre()),
+                () -> assertNotNull(examen.getPreguntas())
+        );
+
+        verify(preguntaRepository).findPreguntaByExamenId(anyLong());
+    }
+
+    @Test
+    void testSaveExamenIncrementalWithDoAnswer() {
+        // Given
+        var e = EXAMEN_INCREMENTAL;
+        e.setPreguntas(PREGUNTAS);
+        doAnswer(new Answer<Examen>() {
+            Long secuencia = 8L;
+
+            @Override
+            public Examen answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Examen examen = invocationOnMock.getArgument(0);
+                examen.setId(secuencia++);
+                return examen;
+            }
+        }).when(examenRepository).save(any(Examen.class));
+
+        // When
+        var examen = service.saveExamen(e);
+
+        // Then
+        assertAll(
+                () -> assertNotNull(examen.getId()),
+                () -> assertEquals(8L, examen.getId()),
+                () -> assertEquals("Fisica", examen.getNombre())
+        );
+    }
 }
